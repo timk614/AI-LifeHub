@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "AI LifeHub"
+description = "A responsive AI companion for everyday decisions, learning, general questions, and safer next steps, with a polished demo mode that works without external API keys."
+version = "1.0.0"
+id = "artifacts/ai-lifehub"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25492
+
+[services.development]
+run = "pnpm --filter @workspace/ai-lifehub run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ai-lifehub", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ai-lifehub/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25492"
+BASE_PATH = "/"

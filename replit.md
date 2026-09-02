@@ -1,6 +1,6 @@
-# [Project name]
+# AI LifeHub
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+AI LifeHub is a responsive demo-ready AI companion for secondhand shopping decisions, study support, general questions, and safer next steps.
 
 ## Run & Operate
 
@@ -22,15 +22,21 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/ai-lifehub` — the deployable React + Vite web app
+- `artifacts/api-server/src/routes/ai.ts` — validated AI demo endpoints
+- `lib/api-spec/openapi.yaml` — source of truth for API contracts
+- `lib/api-client-react` and `lib/api-zod` — generated API hooks and schemas
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first release is demo-first: every primary flow works without a model key.
+- Browser persistence is isolated behind a storage abstraction so it can be replaced with a database later.
+- AI responses are structured and validated at the server boundary.
+- Safety and market responses use uncertainty-aware language rather than presenting guesses as facts.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The app includes Dashboard, Market AI, StudyAI, AI Assistant, SafeHelp, History, Favorites, Settings, and Profile routes with responsive desktop sidebar and mobile navigation.
 
 ## User preferences
 

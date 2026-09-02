@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: ai
+    description: AI assistant operations
+  - name: dashboard
+    description: Dashboard summaries
 paths:
   /healthz:
     get:
@@ -24,6 +28,112 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Get recent activity
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+  /ai/market/analyze:
+    post:
+      operationId: analyzeMarketItem
+      tags: [ai]
+      summary: Analyze a secondhand marketplace item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketAnalysisInput"
+      responses:
+        "200":
+          description: Market analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketAnalysis"
+        "400":
+          description: Invalid request
+  /ai/study/explain:
+    post:
+      operationId: explainStudyTopic
+      tags: [ai]
+      summary: Explain a study topic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyExplanationInput"
+      responses:
+        "200":
+          description: Topic explanation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyExplanation"
+        "400":
+          description: Invalid request
+  /ai/chat/respond:
+    post:
+      operationId: respondToChat
+      tags: [ai]
+      summary: Respond to an AI assistant message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "400":
+          description: Invalid request
+  /ai/safehelp/respond:
+    post:
+      operationId: respondToSafeHelp
+      tags: [ai]
+      summary: Give a safe next step for a difficult situation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SafeHelpRequest"
+      responses:
+        "200":
+          description: SafeHelp response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SafeHelpResponse"
+        "400":
+          description: Invalid request
 components:
   schemas:
     HealthStatus:
@@ -33,4 +143,143 @@ components:
           type: string
       required:
         - status
+    DashboardSummary:
+      type: object
+      required: [topicsLearned, practiceSessions, savedItems, planProgress]
+      properties:
+        topicsLearned:
+          type: number
+        practiceSessions:
+          type: number
+        savedItems:
+          type: number
+        planProgress:
+          type: number
+    ActivityItem:
+      type: object
+      required: [id, type, title, detail, time]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [market, study, chat, safehelp, plan]
+        title:
+          type: string
+        detail:
+          type: string
+        time:
+          type: string
+    MarketAnalysisInput:
+      type: object
+      required: [title, price, currency]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        price:
+          type: number
+          minimum: 0
+        currency:
+          type: string
+          enum: [UAH, USD, EUR, GBP, PLN]
+        imageName:
+          type: ["string", "null"]
+    MarketAnalysis:
+      type: object
+      required: [category, brand, model, description, condition, estimatedPriceMin, estimatedPriceMax, currency, sellerPrice, difference, confidence, thingsToCheck, verdict, demo]
+      properties:
+        category: { type: string }
+        brand: { type: string }
+        model: { type: string }
+        description: { type: string }
+        condition: { type: string }
+        estimatedPriceMin: { type: number }
+        estimatedPriceMax: { type: number }
+        currency: { type: string }
+        sellerPrice: { type: number }
+        difference: { type: number }
+        confidence: { type: number, minimum: 0, maximum: 100 }
+        thingsToCheck:
+          type: array
+          items: { type: string }
+        verdict:
+          type: string
+          enum: [good, fair, expensive]
+        demo: { type: boolean }
+    StudyExplanationInput:
+      type: object
+      required: [subject, level, topic, depth]
+      properties:
+        subject: { type: string, minLength: 1 }
+        level: { type: string, minLength: 1 }
+        topic: { type: string, minLength: 1 }
+        depth:
+          type: string
+          enum: [simple, standard, deep]
+    StudyExplanation:
+      type: object
+      required: [topic, whatIsIt, keyRule, example, memoryTip, commonMistakes, checkQuestion, demo]
+      properties:
+        topic: { type: string }
+        whatIsIt: { type: string }
+        keyRule: { type: string }
+        example: { type: string }
+        memoryTip: { type: string }
+        commonMistakes:
+          type: array
+          items: { type: string }
+        checkQuestion: { type: string }
+        demo: { type: boolean }
+    ChatRequest:
+      type: object
+      required: [message, mode]
+      properties:
+        message: { type: string, minLength: 1 }
+        mode:
+          type: string
+          enum: [study, market, general, safehelp]
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+    ChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content: { type: string }
+    ChatResponse:
+      type: object
+      required: [message, demo]
+      properties:
+        message: { type: string }
+        demo: { type: boolean }
+    SafeHelpRequest:
+      type: object
+      required: [situation]
+      properties:
+        situation: { type: string, minLength: 1 }
+        category: { type: ["string", "null"] }
+    SafeHelpResponse:
+      type: object
+      required: [situation, riskLevel, summary, immediateActions, avoid, whenToGetHelp, recommendedContact, emergency, demo]
+      properties:
+        situation: { type: string }
+        riskLevel:
+          type: string
+          enum: [low, medium, high, emergency]
+        summary: { type: string }
+        immediateActions:
+          type: array
+          items: { type: string }
+        avoid:
+          type: array
+          items: { type: string }
+        whenToGetHelp: { type: string }
+        recommendedContact: { type: string }
+        emergency: { type: boolean }
+        demo: { type: boolean }
 

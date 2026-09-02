@@ -1,0 +1,1 @@
+- [OpenAPI integer codegen](codegen-zod-integer.md) — current Orval/Zod versions require numeric schemas instead of generated zod.int() calls.
