@@ -12,7 +12,7 @@ pnpm install
 
 ## Environment
 
-The first build runs in DEMO MODE and needs no API key. For a future direct OpenAI deployment, copy `.env.example` and set `OPENAI_API_KEY` only on the server. Never expose it through `VITE_*`, React code, localStorage, or the browser bundle.
+Live AI uses the server-side `OPENAI_API_KEY` Replit Secret. The key is never exposed through `VITE_*`, React code, localStorage, or the browser bundle. If the secret is missing or the provider is unavailable, each endpoint returns a clearly labeled fallback response instead of failing silently.
 
 ## Development
 
@@ -20,7 +20,7 @@ The first build runs in DEMO MODE and needs no API key. For a future direct Open
 pnpm --filter @workspace/ai-lifehub run dev
 ```
 
-The application is served through the project preview. The server-side demo endpoints are available under `/api`.
+The application is served through the project preview. The server-side AI endpoints are available under `/api`.
 
 ## Production
 
@@ -32,20 +32,20 @@ pnpm --filter @workspace/ai-lifehub run serve
 ## Architecture
 
 - `src/App.tsx` and `src/components/` contain the responsive product shell and feature pages.
-- `src/lib/storage.ts` provides the browser persistence abstraction used by the DEMO mode.
+- `src/lib/storage.ts` provides the browser persistence abstraction for local history and preferences.
 - `lib/api-spec/openapi.yaml` is the API contract for the AI and dashboard endpoints.
-- `artifacts/api-server/src/routes/ai.ts` validates requests and returns structured, clearly labeled demo responses.
+- `artifacts/api-server/src/routes/ai.ts` validates requests, calls OpenAI on the server, and keeps a structured fallback response for provider outages.
 - Generated hooks live in `lib/api-client-react` and are consumed by the frontend.
 
-The browser can continue working without an AI provider: user-created history, favorites, chats, plans, and preferences persist locally. This makes it possible to explore every flow safely before connecting a model.
+The browser can continue working during an AI provider outage: user-created history, favorites, chats, plans, and preferences persist locally.
 
 ## AI services
 
 The server has separate contract surfaces for market analysis, study explanations, general chat, and SafeHelp. Each response is structured and includes a `demo` flag. The market and SafeHelp copy intentionally uses uncertainty-aware language and avoids presenting authenticity, prices, risk, or diagnoses as facts.
 
-## DEMO mode
+## Fallback mode
 
-Demo data is explicitly marked in the interface. Similar marketplace items are illustrative only and are not live listings or current market prices. The AI demo responses are predictable starter guidance, not professional advice.
+Fallback responses are explicitly marked in the interface. Similar marketplace items are illustrative only and are not live listings or current market prices. Live AI responses are still guidance, not professional advice.
 
 ## Storage
 

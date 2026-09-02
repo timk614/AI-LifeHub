@@ -1,1 +1,2 @@
 - [OpenAPI integer codegen](codegen-zod-integer.md) — current Orval/Zod versions require numeric schemas instead of generated zod.int() calls.
+- [Direct OpenAI key handling](openai-direct-key.md) — keep keys server-only, redact provider errors, and verify the stored key is accepted before claiming live AI.
